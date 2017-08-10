@@ -24,7 +24,6 @@ Template.hello.events({
   'click button': function(event, instance) {
     // This event will be fired when user click on every button tag in its template.
     event.preventDefault();
-    console.log('click on the button', this);
     // increment the counter when button is clicked
     instance.counter.set(instance.counter.get() + 1);
   },
@@ -44,7 +43,7 @@ console.log('Hello world!', Meteor.isClient);
 }*/
 Template.leaderboard.helpers({
   player() {
-    return PlayersList.find();
+    return PlayersList.find({}, { sort: { score: -1, name: 1 } });
   },
   selectedClass() {
     console.log('this: ', this);
@@ -59,5 +58,12 @@ Template.leaderboard.events({
     console.log('You clicked on a player element.', this);
     Session.set('selectedPlayer', this._id);
     console.log('Session value: ', Session.get('selectedPlayer'));
+  },
+  'click .give-five-points': function(evt, instance) {
+    const playerId = Session.get('selectedPlayer');
+    PlayerList.update(playerId, {$inc: {score: 5}});
+  },
+  'click .take-five-points': function(evt, instance) {
+    PlayerList.update(Session.get('selectedPlayer'), { $inc: { score: -5 } });
   }
 })
