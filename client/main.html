@@ -8,7 +8,10 @@
   {{> hello}}
   {{> info}}
   <hr/>
+  {{> addPlayerForm}}
+  <hr/>
   {{> leaderboard}}
+  {{> loginButtons }}
 </body>
 
 <template name="hello">
@@ -33,4 +36,15 @@
   {{/each}}
   <button class="give-five-points">Give 5 points</button>
   <button class="take-five-points">Take 5 points</button>
+</template>
+
+<template name="addPlayerForm">
+  {{#if currentUser }}
+    <h1>Add a player.</h1>
+    <form>
+      <input type="text" name="playerName" />
+      <input type="submit" name="submitAddPlayer" value="Add Player" />
+    </form>
+    <button id="removePlayer">Remove Player</button>
+  {{/if}}
 </template>

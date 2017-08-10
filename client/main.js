@@ -25,6 +25,7 @@ Template.hello.events({
     // This event will be fired when user click on every button tag in its template.
     event.preventDefault();
     // increment the counter when button is clicked
+    console.log('counter instance: ', instance, this);
     instance.counter.set(instance.counter.get() + 1);
   },
   'click a': function(e, instance) {
@@ -43,7 +44,8 @@ console.log('Hello world!', Meteor.isClient);
 }*/
 Template.leaderboard.helpers({
   player() {
-    return PlayersList.find({}, { sort: { score: -1, name: 1 } });
+    const currentUserId = Meteor.userId();
+    return PlayersList.find({createdBy: currentUserId}, { sort: { score: -1, name: 1 } });
   },
   selectedClass() {
     console.log('this: ', this);
@@ -54,16 +56,35 @@ Template.leaderboard.helpers({
 });
 
 Template.leaderboard.events({
-  'click .player': function(event, instance) {
+  'click .player': function(event,) {
     console.log('You clicked on a player element.', this);
     Session.set('selectedPlayer', this._id);
-    console.log('Session value: ', Session.get('selectedPlayer'));
   },
-  'click .give-five-points': function(evt, instance) {
+  'click .give-five-points': function(evt) {
     const playerId = Session.get('selectedPlayer');
     PlayerList.update(playerId, {$inc: {score: 5}});
   },
-  'click .take-five-points': function(evt, instance) {
+  'click .take-five-points': function(evt) {
     PlayerList.update(Session.get('selectedPlayer'), { $inc: { score: -5 } });
   }
+});
+
+Template.addPlayerForm.events({
+  'submit form': function(evt) {
+    evt.preventDefault();
+    const form = evt.target;
+    const currentUserId = Meteor.userId();
+    PlayerList.insert({
+      name: form.playerName.value,
+      score: 0,
+      createdBy: currentUserId
+    });
+    form.reset();
+  },
+  'click #removePlayer': function() {
+    const playerId = Session.get('selectedPlayer');
+    if (playerId) {
+      PlayerList.remove(playerId);
+    }
+  } 
 })
